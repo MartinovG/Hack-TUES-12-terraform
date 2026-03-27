@@ -1,0 +1,77 @@
+services:
+  postgres:
+    image: postgres:14-alpine
+    container_name: hacktues-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-vm_sharing}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - hacktues-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./Hack-TUES-12-backend
+      dockerfile: Dockerfile.dev
+    container_name: hacktues-backend
+    restart: unless-stopped
+    ports:
+      - "${BACKEND_PORT:-3000}:3000"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      DB_DATABASE: ${POSTGRES_DB:-vm_sharing}
+      JWT_SECRET: ${JWT_SECRET:-your_super_secret_jwt_key_change_in_production_12345}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-24h}
+      PORT: 3000
+      NODE_ENV: development
+      API_URL: http://${PUBLIC_HOST:-localhost}:${BACKEND_PORT:-3000}
+      CORS_ORIGIN: http://${PUBLIC_HOST:-localhost}:${FRONTEND_PORT:-5173}
+      FRONTEND_URL: http://${PUBLIC_HOST:-localhost}:${FRONTEND_PORT:-5173}
+    volumes:
+      - ./Hack-TUES-12-backend:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - hacktues-network
+    command: npm run start:dev
+
+  frontend:
+    build:
+      context: ./Hack-TUES-12-frontend/Frontend
+      dockerfile: Dockerfile.dev
+    container_name: hacktues-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    environment:
+      VITE_API_URL: http://${PUBLIC_HOST:-localhost}:${BACKEND_PORT:-3000}
+    volumes:
+      - ./Hack-TUES-12-frontend/Frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - hacktues-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  hacktues-network:
+    driver: bridge
