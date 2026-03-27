@@ -37,9 +37,9 @@ services:
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-24h}
       PORT: 3000
       NODE_ENV: development
-      API_URL: http://${PUBLIC_HOST:-localhost}:${BACKEND_PORT:-3000}
-      CORS_ORIGIN: http://${PUBLIC_HOST:-localhost}:${FRONTEND_PORT:-5173}
-      FRONTEND_URL: http://${PUBLIC_HOST:-localhost}:${FRONTEND_PORT:-5173}
+      API_URL: "http://${PUBLIC_HOST}:${BACKEND_PORT:-3000}"
+      CORS_ORIGIN: "http://${PUBLIC_HOST}:${FRONTEND_PORT:-5173}"
+      FRONTEND_URL: "http://${PUBLIC_HOST}:${FRONTEND_PORT:-5173}"
     volumes:
       - ./Hack-TUES-12-backend:/app
       - /app/node_modules
@@ -59,7 +59,7 @@ services:
     ports:
       - "${FRONTEND_PORT:-5173}:5173"
     environment:
-      VITE_API_URL: http://${PUBLIC_HOST:-localhost}:${BACKEND_PORT:-3000}
+      VITE_API_URL: "http://${PUBLIC_HOST}:${BACKEND_PORT:-3000}"
     volumes:
       - ./Hack-TUES-12-frontend/Frontend:/app
       - /app/node_modules
