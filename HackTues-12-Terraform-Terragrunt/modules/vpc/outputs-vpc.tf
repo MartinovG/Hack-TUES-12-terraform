@@ -1,0 +1,13 @@
+output "vpc_id" { value = aws_vpc.main.id }
+output "public_subnet_ids" { value = aws_subnet.public_subnet[*].id }
+output "private_subnet_ids" { value = aws_subnet.private_subnet[*].id }
+output "codebuild_private_subnet_ids" { value = aws_subnet.codebuild_private_subnet[*].id }
+output "alb_sg_id" { value = aws_security_group.alb_sg.id }
+output "ecs_sg_id" { value = aws_security_group.ecs_sg.id }
+output "codebuild_sg_id" { value = aws_security_group.codebuild_sg.id }
+output "bastion_sg_id" { value = aws_security_group.bastion_sg.id }
+output "docdb_sg_id" { value = aws_security_group.docdb_sg.id }
+output "postgres_sg_id" { value = aws_security_group.docdb_sg.id }
+output "vpc_cidr" { value = aws_vpc.main.cidr_block }
+output "private_subnet_cidrs" { value = [for s in aws_subnet.private_subnet : s.cidr_block] }
+output "nat_gateway_ids" { value = [aws_nat_gateway.public_nat.id] }

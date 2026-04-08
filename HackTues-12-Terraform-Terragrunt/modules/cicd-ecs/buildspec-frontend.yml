@@ -1,0 +1,39 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 22
+    commands:
+# Use the following curl command until AWS updates their default codebuild image with the expiring YARN key in 2026
+      - curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+# Install needed command line tools
+      - apt-get update
+      - apt install jq
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - echo $CODEBUILD_RESOLVED_SOURCE_VERSION
+      - echo $COMMIT_HASH
+      - IMAGE_TAG=$${COMMIT_HASH:=latest}
+      - echo $IMAGE_TAG
+  build:
+    commands:
+      - echo Build started on `date`
+      - docker --version
+      - cd frontendReact
+      - docker build -t ${IMAGE_REPO_NAME} .
+      - docker tag ${IMAGE_REPO_NAME}:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:latest
+      - docker tag ${IMAGE_REPO_NAME}:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:$IMAGE_TAG
+  post_build:
+    commands:
+      - echo Writing image definitions file...
+      - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:latest
+      - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:$IMAGE_TAG
+      - printf '[{"name":"%s","imageUri":"%s"}]' ${CONTAINER_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:$IMAGE_TAG > imagedefinitions.json
+      - echo Build completed on `date`
+artifacts:
+  base-directory: frontendReact
+  files: 
+      - imagedefinitions.json
