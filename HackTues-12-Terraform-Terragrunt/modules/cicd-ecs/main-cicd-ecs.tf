@@ -1,3 +1,39 @@
+locals {
+  codebuild_core_app_project_names = {
+    for service_name, _ in var.core_app :
+    service_name => "${var.environment}-${var.app_name}-${service_name}-ecs-build"
+  }
+
+  codebuild_frontend_project_names = {
+    for service_name, _ in var.frontend :
+    service_name => "${var.environment}-${var.app_name}-${service_name}-ecs-build"
+  }
+
+  codebuild_service_project_names = {
+    for service_name, _ in var.service :
+    service_name => "${var.environment}-${var.app_name}-${service_name}-ecs-build"
+  }
+
+  codepipeline_core_app_names = {
+    for service_name, _ in var.core_app :
+    service_name => "${var.environment}-${var.app_name}-${service_name}-ecs-pipeline"
+  }
+
+  codepipeline_frontend_names = {
+    for service_name, _ in var.frontend :
+    service_name => "${var.environment}-${var.app_name}-${service_name}-ecs-pipeline"
+  }
+
+  codepipeline_service_names = {
+    for service_name, _ in var.service :
+    service_name => "${var.environment}-${var.app_name}-${service_name}-ecs-pipeline"
+  }
+
+  codebuild_core_app_log_group_name = "/aws/codebuild/${var.environment}-${var.app_name}-core-app-ecs"
+  codebuild_frontend_log_group_name = "/aws/codebuild/${var.environment}-${var.app_name}-frontend-ecs"
+  codebuild_service_log_group_name  = "/aws/codebuild/${var.environment}-${var.app_name}-service-ecs"
+}
+
 // S3 bucket for CodeBuild/CodePipeline artifacts
 resource "aws_s3_bucket" "codepipeline_bucket_ecs" {
   bucket        = "${var.environment}-${var.app_name}-codepipeline-artefacts-ecs"

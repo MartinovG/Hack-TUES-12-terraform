@@ -1,7 +1,7 @@
 // CodePipeline for Frontend
 resource "aws_codepipeline" "codepipeline_frontend" {
   for_each      = var.frontend
-  name          = "${each.key}-ecs"
+  name          = local.codepipeline_frontend_names[each.key]
   pipeline_type = "V2"
   role_arn      = aws_iam_role.codepipeline_service_role.arn
   artifact_store {
@@ -53,7 +53,7 @@ resource "aws_codepipeline" "codepipeline_frontend" {
       region           = var.region
       namespace        = "BuildVariables"
       configuration = {
-        ProjectName = "${each.key}-ecs"
+        ProjectName = local.codebuild_frontend_project_names[each.key]
       }
     }
   }

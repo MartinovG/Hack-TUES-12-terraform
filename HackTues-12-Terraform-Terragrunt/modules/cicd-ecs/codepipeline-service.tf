@@ -1,7 +1,7 @@
 // CodePipeline for Services
 resource "aws_codepipeline" "codepipeline_service" {
   for_each      = var.service
-  name          = "${each.key}-ecs"
+  name          = local.codepipeline_service_names[each.key]
   pipeline_type = "V2"
   role_arn      = aws_iam_role.codepipeline_service_role.arn
   artifact_store {
@@ -53,7 +53,7 @@ resource "aws_codepipeline" "codepipeline_service" {
       region           = var.region
       namespace        = "BuildVariables"
       configuration = {
-        ProjectName = "${each.key}-ecs"
+        ProjectName = local.codebuild_service_project_names[each.key]
       }
     }
   }

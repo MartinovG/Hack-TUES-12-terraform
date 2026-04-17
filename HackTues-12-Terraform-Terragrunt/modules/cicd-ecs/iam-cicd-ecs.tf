@@ -35,9 +35,9 @@ data "aws_iam_policy_document" "codebuild_service_role" {
     effect  = "Allow"
     actions = ["logs:CreateLogStream", "logs:PutLogEvents"]
     resources = [
-      "arn:aws:logs:${var.region}:${var.account_id}:log-group:/aws/codebuild/core-app-ecs:*",
-      "arn:aws:logs:${var.region}:${var.account_id}:log-group:/aws/codebuild/frontend-ecs:*",
-      "arn:aws:logs:${var.region}:${var.account_id}:log-group:/aws/codebuild/service-ecs:*"
+      "arn:aws:logs:${var.region}:${var.account_id}:log-group:${local.codebuild_core_app_log_group_name}:*",
+      "arn:aws:logs:${var.region}:${var.account_id}:log-group:${local.codebuild_frontend_log_group_name}:*",
+      "arn:aws:logs:${var.region}:${var.account_id}:log-group:${local.codebuild_service_log_group_name}:*"
     ]
   }
 
@@ -196,11 +196,11 @@ data "aws_iam_policy_document" "codepipeline_service_role" {
       "codebuild:BatchGetBuilds",
       "codebuild:StartBuild"
     ]
-    resources = [
-      "arn:aws:codebuild:${var.region}:${var.account_id}:project/backend-ecs",
-      "arn:aws:codebuild:${var.region}:${var.account_id}:project/frontend-ecs",
-      "arn:aws:codebuild:${var.region}:${var.account_id}:project/algorithms-ecs"
-    ]
+    resources = concat(
+      [for project_name in values(local.codebuild_core_app_project_names) : "arn:aws:codebuild:${var.region}:${var.account_id}:project/${project_name}"],
+      [for project_name in values(local.codebuild_frontend_project_names) : "arn:aws:codebuild:${var.region}:${var.account_id}:project/${project_name}"],
+      [for project_name in values(local.codebuild_service_project_names) : "arn:aws:codebuild:${var.region}:${var.account_id}:project/${project_name}"]
+    )
   }
 
   # ECR image description

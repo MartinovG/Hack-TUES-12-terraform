@@ -39,7 +39,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_role_policy_attachment_task_
   policy_arn = aws_iam_policy.task_role_policy.arn
 }
 resource "aws_iam_policy" "task_role_policy" {
-  name   = "TaskPermissions"
+  name   = "${var.environment}-${var.app_name}-task-permissions"
   path   = "/"
   policy = data.aws_iam_policy_document.task_role_policy_template.json
 }
@@ -110,7 +110,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy_attach
 /// Policy for the secrets
 
 resource "aws_iam_policy" "ecs_accessing_secrets" {
-  name        = "ecs_accessing_secrets"
+  name        = "${var.environment}-${var.app_name}-ecs-accessing-secrets"
   description = "Policy allowing ECS to access both Parameter Store secrets and Secrets Manager secrets"
   policy      = <<EOF
 {

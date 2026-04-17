@@ -1,7 +1,7 @@
 // CodeBuild for Frontend
 resource "aws_codebuild_project" "codebuild_frontend" {
   for_each       = var.frontend
-  name           = "${each.key}-ecs"
+  name           = local.codebuild_frontend_project_names[each.key]
   description    = "CodeBuild to build the frontend image and push it to ECR for use by ECS"
   service_role   = aws_iam_role.codebuild_service_role.arn
   source_version = each.value.branch
@@ -59,6 +59,6 @@ resource "aws_codebuild_project" "codebuild_frontend" {
   }
 }
 resource "aws_cloudwatch_log_group" "codebuild_frontend_logging" {
-  name              = "/aws/codebuild/frontend-ecs"
+  name              = local.codebuild_frontend_log_group_name
   retention_in_days = 7
 }
