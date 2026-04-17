@@ -4,7 +4,7 @@
 // ALB 
 
 resource "aws_lb" "public_alb" {
-  name               = "public-alb"
+  name               = "${var.environment}-${var.app_name}-public-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [var.alb_sg_id]
@@ -12,7 +12,7 @@ resource "aws_lb" "public_alb" {
 }
 
 resource "aws_ssm_parameter" "public_alb_DNS" {
-  name        = "/lb/public-alb-DNS"
+  name        = "/lb/${var.environment}/${var.app_name}/public-alb-dns"
   description = "The DNS name of the Public ALB"
   type        = "String"
   value       = aws_lb.public_alb.dns_name

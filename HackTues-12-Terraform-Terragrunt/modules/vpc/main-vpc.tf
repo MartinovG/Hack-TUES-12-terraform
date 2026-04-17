@@ -114,11 +114,11 @@ resource "aws_flow_log" "main_vpc_flowlogs" {
   tags            = { Name = "${var.environment}-${var.app_name}-entire-vpc-flow-logging" }
 }
 resource "aws_cloudwatch_log_group" "main_vpc_flowlogs_loggroup" {
-  name              = "/vpc/main-vpc-flowlogs-loggroup"
+  name              = "/vpc/${var.environment}-${var.app_name}-flowlogs"
   retention_in_days = 7
 }
 resource "aws_iam_role" "main_vpc_flowlogs_role" {
-  name               = "main-vpc-flowlogs-role"
+  name               = "${var.environment}-${var.app_name}-vpc-flowlogs-role"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -134,7 +134,7 @@ resource "aws_iam_role" "main_vpc_flowlogs_role" {
 EOF
 }
 resource "aws_iam_role_policy" "main_vpc_flowlogs_role_policy" {
-  name   = "main-vpc-flowlogs-policy"
+  name   = "${var.environment}-${var.app_name}-vpc-flowlogs-policy"
   role   = aws_iam_role.main_vpc_flowlogs_role.id
   policy = <<EOF
 {

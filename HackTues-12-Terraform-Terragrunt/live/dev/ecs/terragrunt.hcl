@@ -102,8 +102,8 @@ inputs = {
   core_app           = local.core_app
   frontend           = local.frontend
   core_app_ecr_url   = { for k, v in dependency.ecr.outputs.core_app_repos : k => v.url }
-  core_app_image_tag = { backend = "finalfix-20260408" }
+  core_app_image_tag = { backend = "deploy-20260416-170045" }
   frontend_ecr_url   = { for k, v in dependency.ecr.outputs.frontend_repos : k => v.url }
-  frontend_image_tag = { frontend = "finalfix-20260408" }
+  frontend_image_tag = { frontend = "deploy-20260416-170045" }
   service_ecr_url    = {}
 }

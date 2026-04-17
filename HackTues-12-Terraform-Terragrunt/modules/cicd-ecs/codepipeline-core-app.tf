@@ -1,7 +1,7 @@
 // CodePipeline for Core App
 resource "aws_codepipeline" "codepipeline_core_app" {
   for_each      = var.core_app
-  name          = "${each.key}-ecs"
+  name          = local.codepipeline_core_app_names[each.key]
   pipeline_type = "V2"
   role_arn      = aws_iam_role.codepipeline_service_role.arn
   artifact_store {
@@ -53,7 +53,7 @@ resource "aws_codepipeline" "codepipeline_core_app" {
       region           = var.region
       namespace        = "BuildVariables"
       configuration = {
-        ProjectName = "${each.key}-ecs"
+        ProjectName = local.codebuild_core_app_project_names[each.key]
       }
     }
   }

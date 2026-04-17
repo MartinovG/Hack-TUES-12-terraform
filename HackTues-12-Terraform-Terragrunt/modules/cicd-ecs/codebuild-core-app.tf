@@ -1,7 +1,7 @@
 // CodeBuild for Core App
 resource "aws_codebuild_project" "codebuild_core_app" {
   for_each       = var.core_app
-  name           = "${each.key}-ecs"
+  name           = local.codebuild_core_app_project_names[each.key]
   description    = "CodeBuild to build the core-app image and push it to ECR for use by ECS"
   service_role   = aws_iam_role.codebuild_service_role.arn
   source_version = each.value.branch
@@ -55,6 +55,6 @@ resource "aws_codebuild_project" "codebuild_core_app" {
   }
 }
 resource "aws_cloudwatch_log_group" "codebuild_core_app_logging" {
-  name              = "/aws/codebuild/core-app-ecs"
+  name              = local.codebuild_core_app_log_group_name
   retention_in_days = 7
 }
